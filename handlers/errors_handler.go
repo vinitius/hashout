@@ -1,9 +1,9 @@
 package handlers
 
 import (
-	"order-management/config/log"
+	"viniti.us/hashout/config/log"
 
-	"viniti.us/hashout/models/customErr"
+	customErr "viniti.us/hashout/models/errors"
 
 	"github.com/gin-gonic/gin"
 )
