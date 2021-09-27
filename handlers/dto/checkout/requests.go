@@ -20,7 +20,16 @@ func (i Item) ToDomain() checkout.Item {
 
 func (c Checkout) ToDomain() checkout.Cart {
 	var items []checkout.Item
+	uniqueItems := make(map[int32]Item)
 	for _, i := range c.Items {
+		if repeated, found := uniqueItems[i.ID]; found {
+			uniqueItems[i.ID] = Item{ID: repeated.ID, Quantity: repeated.Quantity + i.Quantity}
+		} else {
+			uniqueItems[i.ID] = i
+		}
+	}
+
+	for _, i := range uniqueItems {
 		items = append(items, i.ToDomain())
 	}
 

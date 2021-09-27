@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"encoding/json"
 	"errors"
 
 	"viniti.us/hashout/config/db"
@@ -16,19 +17,25 @@ func NewProductRepository(d db.ProductsDataset) ProductRepository {
 	return ProductRepository{db: d}
 }
 
-func (r ProductRepository) Find(items []checkout.Item) (mergedItems []checkout.Item, err error) {
+func (r ProductRepository) FindAll(items []checkout.Item) (mergedItems []checkout.Item, err error) {
 	var notFound []int32
 	for _, i := range items {
 		if p, found := r.db.ByID[i.Product.ID]; found {
 			mergedItems = append(mergedItems, i.Merge(p))
 		} else {
-			notFound = append(notFound, p.ID)
+			notFound = append(notFound, i.Product.ID)
 		}
 	}
 
 	if len(notFound) > 0 {
-		err = &customErr.NotFound{Entity: "Product", Err: errors.New("the following products were not found: " + string(notFound))}
+		p, _ := json.Marshal(notFound)
+		err = &customErr.NotFound{Entity: "Product", Err: errors.New("the following products were not found: " + string(p))}
 	}
 
+	return
+}
+
+func (r ProductRepository) FindLastByIsGift(isGift bool) (product checkout.Product, err error) {
+	product = r.db.ByIsGift[isGift]
 	return
 }

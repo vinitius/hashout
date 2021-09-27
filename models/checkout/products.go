@@ -11,7 +11,7 @@ type Product struct {
 type Item struct {
 	Product      Product
 	Quantity     uint32
-	DiscountRate uint32
+	DiscountRate float32
 	UnitAmount   uint32
 	TotalAmount  uint32
 	Discount     uint32
@@ -26,4 +26,8 @@ func (i Item) Merge(p Product) Item {
 		TotalAmount:  p.Amount * i.Quantity,
 		Discount:     i.Discount,
 	}
+}
+
+func (i *Item) CalculateDiscount() {
+	i.Discount = (i.TotalAmount * uint32(i.DiscountRate)) / 100
 }

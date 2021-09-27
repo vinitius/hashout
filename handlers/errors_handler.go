@@ -31,14 +31,6 @@ func fromNotValid(err *customErr.NotValid) *ApiError {
 	}
 }
 
-func fromMalFormed(err *customErr.MalFormed) *ApiError {
-	return &ApiError{
-		Code:    400,
-		Message: err.Error(),
-		Reason:  "Malformed Payload.",
-	}
-}
-
 func fromGeneric(err error) *ApiError {
 	return &ApiError{
 		Code:    500,
@@ -65,8 +57,6 @@ func apiErrorReporter(errType gin.ErrorType) gin.HandlerFunc {
 				apiError = fromNotFound(parsed)
 			case *customErr.NotValid:
 				apiError = fromNotValid(parsed)
-			case *customErr.MalFormed:
-				apiError = fromMalFormed(parsed)
 			default:
 				apiError = fromGeneric(parsed)
 			}

@@ -18,13 +18,13 @@ func (e *NotValid) Error() string {
 	return e.Input + " NOT VALID: " + e.Err.Error()
 }
 
-type MalFormed struct {
-	Err   error
-	Input string
+type DiscountError struct {
+	Err  error
+	Type string
 }
 
-func (e *MalFormed) Error() string {
-	return e.Input + " MAL FORMED: " + e.Err.Error()
+func (e *DiscountError) Error() string {
+	return e.Type + " DISCOUNT ERROR: " + e.Err.Error()
 }
 
 type Unexpected struct {

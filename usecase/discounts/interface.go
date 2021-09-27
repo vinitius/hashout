@@ -1,6 +1,9 @@
 package discounts
 
+import "viniti.us/hashout/models/checkout"
+
 type Reader interface {
+	GetDiscount(item *checkout.Item) error
 }
 
 type Client interface {
@@ -8,4 +11,5 @@ type Client interface {
 }
 
 type Service interface {
+	CalculateDiscounts(items []checkout.Item) (itemsWithDiscount []checkout.Item, err error)
 }

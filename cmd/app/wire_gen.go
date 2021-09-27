@@ -6,11 +6,14 @@
 package app
 
 import (
+	"viniti.us/hashout/clients"
 	"viniti.us/hashout/config/db"
+	"viniti.us/hashout/config/grpc"
 	"viniti.us/hashout/handlers"
 	"viniti.us/hashout/handlers/server"
 	"viniti.us/hashout/storage"
 	"viniti.us/hashout/usecase/checkout"
+	"viniti.us/hashout/usecase/discounts"
 )
 
 // Injectors from wire.go:
@@ -19,8 +22,12 @@ func SetupApplication() *server.Api {
 	engine := server.NewRouter()
 	productsDataset := db.NewConnection()
 	productRepository := storage.NewProductRepository(productsDataset)
-	useCase := checkout.NewUseCase(productRepository)
-	checkoutHandler := handlers.NewCheckoutHandler(useCase)
+	context := grpc.NewContext()
+	discountClient := grpc.NewDiscountGRPCClient()
+	clientsDiscountClient := clients.NewDiscountClient(context, discountClient)
+	useCase := discounts.NewUseCase(clientsDiscountClient)
+	checkoutUseCase := checkout.NewUseCase(productRepository, useCase)
+	checkoutHandler := handlers.NewCheckoutHandler(checkoutUseCase)
 	httpServer := server.NewHttpServer(engine, checkoutHandler)
 	api := &server.Api{
 		Server: httpServer,
