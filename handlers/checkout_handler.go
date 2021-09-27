@@ -18,6 +18,6 @@ func (h CheckoutHandler) Routes(r *gin.Engine) {
 	r.POST("/checkout", h.checkout)
 }
 
-func (h CheckoutHandler) checkout() {
+func (h CheckoutHandler) checkout(c *gin.Context) {
 
 }

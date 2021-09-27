@@ -1,10 +1,10 @@
 package discounts
 
-type Writer interface {
+type Reader interface {
 }
 
 type Client interface {
-	Writer
+	Reader
 }
 
 type Service interface {

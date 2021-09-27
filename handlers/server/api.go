@@ -16,10 +16,10 @@ type Api struct {
 	*http.Server
 }
 
-func NewHttpServer(router *gin.Engine, oh handlers.CheckoutHandler) *http.Server {
+func NewHttpServer(router *gin.Engine, c handlers.CheckoutHandler) *http.Server {
 	router.Use(gin.Recovery())
 	router.Use(handlers.ApiErrors())
-	oh.Routes(router)
+	c.Routes(router)
 
 	// simple healthcheck
 	router.GET("/ping", func(c *gin.Context) {
@@ -46,6 +46,6 @@ func NewRouter() *gin.Engine {
 }
 
 func (n Api) ListenAndServe() error {
-	log.Logger.Infof("Starting hahsout http server on port %s", n.Addr)
+	log.Logger.Infof("Starting hashout http server on port %s", n.Addr)
 	return n.Server.ListenAndServe()
 }

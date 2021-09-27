@@ -61,11 +61,11 @@ func apiErrorReporter(errType gin.ErrorType) gin.HandlerFunc {
 			log.Logger.Warn("ApiError: Detected: " + detectedErrors.Errors()[0])
 			err := detectedErrors[0].Err
 			switch parsed := err.(type) {
-			case *expectedErrors.NotFound:
+			case *customErr.NotFound:
 				apiError = fromNotFound(parsed)
-			case *expectedErrors.NotValid:
+			case *customErr.NotValid:
 				apiError = fromNotValid(parsed)
-			case *expectedErrors.MalFormed:
+			case *customErr.MalFormed:
 				apiError = fromMalFormed(parsed)
 			default:
 				apiError = fromGeneric(parsed)

@@ -4,11 +4,11 @@ package app
 
 import (
 	"github.com/google/wire"
-	"viniti.us/hashout/config/di"
+	config "viniti.us/hashout/config/di"
 	"viniti.us/hashout/handlers/server"
 )
 
 func SetupApplication() *server.Api {
-	wire.Build(di.Container)
+	wire.Build(config.Container)
 	return nil
 }
