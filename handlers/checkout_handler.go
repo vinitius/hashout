@@ -1,6 +1,10 @@
 package handlers
 
 import (
+	"net/http"
+
+	dto "viniti.us/hashout/handlers/dto/checkout"
+	customErr "viniti.us/hashout/models/errors"
 	"viniti.us/hashout/usecase/checkout"
 
 	"github.com/gin-gonic/gin"
@@ -19,5 +23,18 @@ func (h CheckoutHandler) Routes(r *gin.Engine) {
 }
 
 func (h CheckoutHandler) checkout(c *gin.Context) {
+	var req dto.Checkout
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.Error(&customErr.NotValid{Input: "Checkout", Err: err})
+		return
+	}
 
+	cart := req.ToDomain()
+
+	if err := h.useCase.Checkout(&cart); err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.JSON(http.StatusOK, dto.ToCheckoutResponse(cart))
 }

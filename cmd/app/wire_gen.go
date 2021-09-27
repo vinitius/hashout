@@ -6,6 +6,7 @@
 package app
 
 import (
+	"viniti.us/hashout/config/db"
 	"viniti.us/hashout/handlers"
 	"viniti.us/hashout/handlers/server"
 	"viniti.us/hashout/storage"
@@ -16,7 +17,8 @@ import (
 
 func SetupApplication() *server.Api {
 	engine := server.NewRouter()
-	productRepository := storage.NewProductRepository()
+	productsDataset := db.NewConnection()
+	productRepository := storage.NewProductRepository(productsDataset)
 	useCase := checkout.NewUseCase(productRepository)
 	checkoutHandler := handlers.NewCheckoutHandler(useCase)
 	httpServer := server.NewHttpServer(engine, checkoutHandler)

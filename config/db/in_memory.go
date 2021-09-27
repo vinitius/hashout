@@ -3,29 +3,36 @@ package db
 import (
 	"encoding/json"
 	"io/ioutil"
-	"os"
+
+	"viniti.us/hashout/config/log"
 
 	"viniti.us/hashout/models/checkout"
 )
 
 type ProductsDataset struct {
-	products []checkout.Product
+	Products []checkout.Product
+	ByID     map[int32]checkout.Product
+	ByIsGift map[bool]checkout.Product
 }
 
-func NewConnection() (d ProductsDataset, err error) {
-	dbFile, err := os.Open("products.json")
+func NewConnection() (d ProductsDataset) {
+	dbFile, err := ioutil.ReadFile("../config/db/products.json")
 	if err != nil {
+		log.Logger.Fatalw("Could not read DB File", "error", err.Error())
 		return
 	}
 
-	defer dbFile.Close()
+	json.Unmarshal(dbFile, &d.Products)
 
-	bytes, err := ioutil.ReadAll(dbFile)
-	if err != nil {
-		return
+	d.ByID = make(map[int32]checkout.Product)
+	d.ByIsGift = make(map[bool]checkout.Product)
+
+	for _, p := range d.Products { // small known static collection
+		d.ByID[p.ID] = p
+		d.ByIsGift[p.IsGift] = p
 	}
 
-	json.Unmarshal(bytes, &d.products)
+	log.Logger.Info("DB is up and running: dataset: ", d.Products)
 
 	return
 }
