@@ -29,7 +29,11 @@ func (h CheckoutHandler) checkout(c *gin.Context) {
 		return
 	}
 
-	cart := req.ToDomain()
+	cart, err := req.ToDomain()
+	if err != nil {
+		c.Error(err)
+		return
+	}
 
 	if err := h.useCase.Checkout(&cart); err != nil {
 		c.Error(err)

@@ -25,8 +25,8 @@ func (u UseCase) CalculateDiscounts(items []checkout.Item) (itemsWithDiscount []
 			failedDiscounts = append(failedDiscounts, i.Product.ID)
 		} else {
 			i.CalculateDiscount()
-			itemsWithDiscount = append(itemsWithDiscount, i)
 		}
+		itemsWithDiscount = append(itemsWithDiscount, i)
 	}
 
 	if len(failedDiscounts) > 0 {

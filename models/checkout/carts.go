@@ -8,17 +8,31 @@ type Cart struct {
 }
 
 func (c *Cart) AddGift(p Product) {
-	item := &Item{Quantity: 1}
-	gift := item.Merge(p)
+	if yes, _ := c.ContainsGift(); !yes {
+		item := Item{Quantity: 1}
+		gift := item.Merge(c.GiftFrom(p))
+		c.Items = append(c.Items, gift)
+	}
 
-	for pos, i := range c.Items {
-		if i.Product.ID == p.ID {
-			c.Items[pos].Quantity += i.Quantity
-			c.Items[pos].TotalAmount += i.TotalAmount
-			return
+}
+
+func (c Cart) GiftFrom(p Product) Product {
+	return Product{
+		ID:     p.ID,
+		Title:  p.Title,
+		IsGift: p.IsGift,
+		Amount: 0,
+	}
+}
+
+func (c Cart) ContainsGift() (contains bool, count int32) {
+	for _, i := range c.Items {
+		if i.Product.IsGift {
+			contains = true
+			count++
 		}
 	}
-	c.Items = append(c.Items, gift)
+	return
 }
 
 func (c *Cart) CalculateTotals() {

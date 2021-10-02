@@ -1,10 +1,13 @@
 package checkout
 
 import (
+	"errors"
 	"time"
 
+	"github.com/spf13/viper"
 	"viniti.us/hashout/config/log"
 	"viniti.us/hashout/models/checkout"
+	customErr "viniti.us/hashout/models/errors"
 	"viniti.us/hashout/usecase/discounts"
 )
 
@@ -22,28 +25,29 @@ func NewUseCase(repo Repository, discountsUseCase discounts.Service) UseCase {
 	return UseCase{repo: repo, discountsUseCase: discountsUseCase}
 }
 
-func (u UseCase) Checkout(c *checkout.Cart) error {
-	products, err := u.repo.FindAll(c.Items)
+func (u UseCase) Checkout(c *checkout.Cart) (err error) {
+	c.Items, err = u.repo.FindAll(c.Items)
 	if err != nil {
 		return err
 	}
 
-	c.Items = products
-
-	if u.IsBlackFriday() {
-		gift, err := u.repo.FindLastByIsGift(true)
-		if err != nil {
-			return err
-		}
-		c.AddGift(gift)
+	contains, count := c.ContainsGift()
+	if contains && count > viper.GetInt32("ALLOWED_GIFTS_PER_CART") {
+		return &customErr.NotValid{Input: "Gift Items", Err: errors.New("more than allowed gifts")}
 	}
 
-	withDiscounts, err := u.discountsUseCase.CalculateDiscounts(products)
+	c.Items, err = u.discountsUseCase.CalculateDiscounts(c.Items)
 	if err != nil {
-		log.Logger.Warn("error upon calculating discounts: ", err.Error())
-		log.Logger.Info("moving on with no discounts!")
-	} else {
-		c.Items = withDiscounts
+		log.Logger.Warn("error upon calculating discounts for one or more products: ", err.Error())
+	}
+
+	if u.IsBlackFridayGiftActive() {
+		gift, err := u.repo.FindLastByIsGift(true)
+		if err != nil {
+			log.Logger.Warn("error adding a gift product: ", err.Error())
+		} else {
+			c.AddGift(gift)
+		}
 	}
 
 	c.CalculateTotals()
@@ -51,7 +55,7 @@ func (u UseCase) Checkout(c *checkout.Cart) error {
 	return nil
 }
 
-func (u UseCase) IsBlackFriday() bool {
+func (u UseCase) IsBlackFridayGiftActive() bool {
 	_, currentMonth, currentDay := time.Now().Date()
-	return BlackFridayMonth == currentMonth && BlackFridayDay == currentDay
+	return viper.GetBool("BLACK_FRIDAY_GIFT_TOGGLE") && BlackFridayMonth == currentMonth && BlackFridayDay == currentDay
 }

@@ -34,5 +34,4 @@ func (c DiscountClient) GetDiscount(item *checkout.Item) error {
 	item.DiscountRate = res.GetPercentage() * 100
 
 	return nil
-
 }

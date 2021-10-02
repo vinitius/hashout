@@ -1,6 +1,11 @@
 package dto
 
-import "viniti.us/hashout/models/checkout"
+import (
+	"errors"
+
+	"viniti.us/hashout/models/checkout"
+	customErr "viniti.us/hashout/models/errors"
+)
 
 type Item struct {
 	ID       int32  `json:"id" binding:"required,gt=0"`
@@ -18,7 +23,12 @@ func (i Item) ToDomain() checkout.Item {
 	}
 }
 
-func (c Checkout) ToDomain() checkout.Cart {
+func (c Checkout) ToDomain() (cart checkout.Cart, err error) {
+	if len(c.Items) == 0 {
+		err = &customErr.NotValid{Input: "Items", Err: errors.New("oops! You need to inform items to make a checkout")}
+		return
+	}
+
 	var items []checkout.Item
 	uniqueItems := make(map[int32]Item)
 	for _, i := range c.Items {
@@ -29,11 +39,11 @@ func (c Checkout) ToDomain() checkout.Cart {
 		}
 	}
 
-	for _, i := range uniqueItems {
-		items = append(items, i.ToDomain())
+	for _, v := range uniqueItems {
+		items = append(items, v.ToDomain())
 	}
 
 	return checkout.Cart{
 		Items: items,
-	}
+	}, nil
 }

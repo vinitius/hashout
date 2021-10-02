@@ -9,13 +9,13 @@ import (
 	"viniti.us/hashout/models/checkout"
 )
 
-type ProductsDataset struct {
+type ProductDataset struct {
 	Products []checkout.Product
 	ByID     map[int32]checkout.Product
 	ByIsGift map[bool]checkout.Product
 }
 
-func NewConnection() (d ProductsDataset) {
+func NewConnection() (d ProductDataset) {
 	dbFile, err := ioutil.ReadFile("../config/db/products.json")
 	if err != nil {
 		log.Logger.Fatalw("Could not read DB File", "error", err.Error())
