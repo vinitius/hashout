@@ -29,7 +29,7 @@ func (c Cart) ContainsGift() (contains bool, count int) {
 	for _, i := range c.Items {
 		if i.Product.IsGift {
 			contains = true
-			count++
+			count += int(i.Quantity)
 		}
 	}
 	return
