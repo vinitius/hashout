@@ -22,6 +22,17 @@ func (h CheckoutHandler) Routes(r *gin.Engine) {
 	r.POST("/checkout", h.checkout)
 }
 
+// Checkout godoc
+// @Summary checkout items within a cart.
+// @Tags Cart
+// @Produce  json
+// @Param filters body dto.Checkout true "Products"
+// @Success 200 {object} dto.CheckoutResponse
+// @Failure 400 {object} ApiError "Invalid Or Missing Products"
+// @Failure 404 {object} ApiError "Products Not Found"
+// @Failure 500 {object} ApiError "Unexpected"
+// @Failure default {object} ApiError
+// @Router /checkout [post]
 func (h CheckoutHandler) checkout(c *gin.Context) {
 	var req dto.Checkout
 	if err := c.ShouldBindJSON(&req); err != nil {

@@ -1,0 +1,164 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Rest API.",
+        "title": "Hashout - Cart API",
+        "termsOfService": "https://viniti.us/terms",
+        "contact": {
+            "name": "API Support",
+            "url": "https://viniti.us/contact",
+            "email": "salomao.tcn@gmail.com"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
+        "version": "1.0"
+    },
+    "host": "localhost:8181",
+    "basePath": "/",
+    "paths": {
+        "/checkout": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Cart"
+                ],
+                "summary": "checkout items within a cart.",
+                "parameters": [
+                    {
+                        "description": "Products",
+                        "name": "filters",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.Checkout"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.CheckoutResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid Or Missing Products",
+                        "schema": {
+                            "$ref": "#/definitions/checkoutApiError"
+                        }
+                    },
+                    "404": {
+                        "description": "Products Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/checkoutApiError"
+                        }
+                    },
+                    "500": {
+                        "description": "Unexpected",
+                        "schema": {
+                            "$ref": "#/definitions/checkoutApiError"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/checkoutApiError"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "checkoutApiError": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "reason": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.Checkout": {
+            "type": "object",
+            "required": [
+                "products"
+            ],
+            "properties": {
+                "products": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.Item"
+                    }
+                }
+            }
+        },
+        "dto.CheckoutResponse": {
+            "type": "object",
+            "properties": {
+                "products": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.ItemResponse"
+                    }
+                },
+                "total_amount": {
+                    "type": "integer"
+                },
+                "total_amount_with_discount": {
+                    "type": "integer"
+                },
+                "total_discount": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.Item": {
+            "type": "object",
+            "required": [
+                "id",
+                "quantity"
+            ],
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "quantity": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.ItemResponse": {
+            "type": "object",
+            "properties": {
+                "discount": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "is_gift": {
+                    "type": "boolean"
+                },
+                "quantity": {
+                    "type": "integer"
+                },
+                "total_amount": {
+                    "type": "integer"
+                },
+                "unit_amount": {
+                    "type": "integer"
+                }
+            }
+        }
+    }
+}

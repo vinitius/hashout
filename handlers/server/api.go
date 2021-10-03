@@ -10,12 +10,29 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
+	ginSwagger "github.com/swaggo/gin-swagger"
+	"github.com/swaggo/gin-swagger/swaggerFiles"
 )
 
 type Api struct {
 	*http.Server
 }
 
+// @title Hashout - Cart API
+// @version 1.0
+// @description Rest API.
+// @termsOfService https://viniti.us/terms
+
+// @contact.name API Support
+// @contact.url https://viniti.us/contact
+// @contact.email salomao.tcn@gmail.com
+
+// @license.name Apache 2.0
+// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host localhost:8181
+// @BasePath /
+// @query.collection.format multi
 func NewHttpServer(router *gin.Engine, c handlers.CheckoutHandler) *http.Server {
 	router.Use(gin.Recovery())
 	router.Use(handlers.ApiErrors())
@@ -27,6 +44,9 @@ func NewHttpServer(router *gin.Engine, c handlers.CheckoutHandler) *http.Server 
 			"message": "pong",
 		})
 	})
+
+	// swagger files
+	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	port := viper.GetString("SERVER_PORT")
 	if port == "" {

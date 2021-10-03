@@ -1,0 +1,108 @@
+basePath: /
+definitions:
+  checkoutApiError:
+    properties:
+      code:
+        type: integer
+      message:
+        type: string
+      reason:
+        type: string
+    type: object
+  dto.Checkout:
+    properties:
+      products:
+        items:
+          $ref: '#/definitions/dto.Item'
+        type: array
+    required:
+    - products
+    type: object
+  dto.CheckoutResponse:
+    properties:
+      products:
+        items:
+          $ref: '#/definitions/dto.ItemResponse'
+        type: array
+      total_amount:
+        type: integer
+      total_amount_with_discount:
+        type: integer
+      total_discount:
+        type: integer
+    type: object
+  dto.Item:
+    properties:
+      id:
+        type: integer
+      quantity:
+        type: integer
+    required:
+    - id
+    - quantity
+    type: object
+  dto.ItemResponse:
+    properties:
+      discount:
+        type: integer
+      id:
+        type: integer
+      is_gift:
+        type: boolean
+      quantity:
+        type: integer
+      total_amount:
+        type: integer
+      unit_amount:
+        type: integer
+    type: object
+host: localhost:8181
+info:
+  contact:
+    email: salomao.tcn@gmail.com
+    name: API Support
+    url: https://viniti.us/contact
+  description: Rest API.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: https://viniti.us/terms
+  title: Hashout - Cart API
+  version: "1.0"
+paths:
+  /checkout:
+    post:
+      parameters:
+      - description: Products
+        in: body
+        name: filters
+        required: true
+        schema:
+          $ref: '#/definitions/dto.Checkout'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.CheckoutResponse'
+        "400":
+          description: Invalid Or Missing Products
+          schema:
+            $ref: '#/definitions/checkoutApiError'
+        "404":
+          description: Products Not Found
+          schema:
+            $ref: '#/definitions/checkoutApiError'
+        "500":
+          description: Unexpected
+          schema:
+            $ref: '#/definitions/checkoutApiError'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/checkoutApiError'
+      summary: checkout items within a cart.
+      tags:
+      - Cart
+swagger: "2.0"
