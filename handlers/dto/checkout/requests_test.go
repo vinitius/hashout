@@ -72,7 +72,7 @@ func (s *RequestsTestSuite) TestCheckoutToDomain() {
 
 	actual, _ := dto.ToDomain()
 
-	assert.Equal(s.T(), expected, actual)
+	assert.Exactly(s.T(), expected, actual)
 }
 
 func (s *RequestsTestSuite) TestCheckoutWithRepeatedItemsToDomain() {

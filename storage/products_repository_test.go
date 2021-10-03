@@ -38,13 +38,32 @@ func TestRun(t *testing.T) {
 
 func (s *ProductRepositorySuite) TestFindAllSuccessfully() {
 	item1 := factories.NewItem()
+	item1.Product.ID = 1
 	item2 := factories.NewItem()
+	item2.Product.ID = 2
 	items := []domain.Item{*item1, *item2}
 
 	foundProduct1 := factories.NewProduct()
 	foundProduct2 := factories.NewProduct()
 
-	expectedItems := []domain.Item{item1.Merge(*foundProduct1), item2.Merge(*foundProduct2)}
+	expectedItem1 := domain.Item{
+		Product:      *foundProduct1,
+		Quantity:     item1.Quantity,
+		DiscountRate: item1.DiscountRate,
+		UnitAmount:   foundProduct1.Amount,
+		TotalAmount:  foundProduct1.Amount * item1.Quantity,
+		Discount:     0,
+	}
+	expectedItem2 := domain.Item{
+		Product:      *foundProduct2,
+		Quantity:     item2.Quantity,
+		DiscountRate: item2.DiscountRate,
+		UnitAmount:   foundProduct2.Amount,
+		TotalAmount:  foundProduct2.Amount * item2.Quantity,
+		Discount:     0,
+	}
+
+	expectedItems := []domain.Item{expectedItem1, expectedItem2}
 
 	s.db.On(findProductByIDMethod, item1.Product.ID).Return(*foundProduct1, true)
 	s.db.On(findProductByIDMethod, item2.Product.ID).Return(*foundProduct2, true)

@@ -1,0 +1,479 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>clients: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">viniti.us/hashout/clients/discount_client.go (88.9%)</option>
+				
+				<option value="file1">viniti.us/hashout/handlers/dto/checkout/requests.go (100.0%)</option>
+				
+				<option value="file2">viniti.us/hashout/handlers/dto/checkout/responses.go (100.0%)</option>
+				
+				<option value="file3">viniti.us/hashout/models/checkout/carts.go (100.0%)</option>
+				
+				<option value="file4">viniti.us/hashout/models/checkout/products.go (100.0%)</option>
+				
+				<option value="file5">viniti.us/hashout/storage/products_repository.go (91.7%)</option>
+				
+				<option value="file6">viniti.us/hashout/usecase/checkout/checkout_usecase.go (94.7%)</option>
+				
+				<option value="file7">viniti.us/hashout/usecase/discounts/discounts_usecase.go (91.7%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package clients
+
+import (
+        "context"
+
+        "viniti.us/hashout/config/log"
+
+        "viniti.us/hashout/models/checkout"
+        discount "viniti.us/hashout/pb"
+)
+
+type DiscountClient struct {
+        grpc discount.DiscountClient
+        ctx  context.Context
+}
+
+func NewDiscountClient(ctx context.Context, grpc discount.DiscountClient) DiscountClient <span class="cov0" title="0">{
+        return DiscountClient{ctx: ctx, grpc: grpc}
+}</span>
+
+func (c DiscountClient) GetDiscount(item *checkout.Item) error <span class="cov8" title="1">{
+        req := &amp;discount.GetDiscountRequest{
+                ProductID: item.Product.ID,
+        }
+
+        res, err := c.grpc.GetDiscount(c.ctx, req)
+        if err != nil </span><span class="cov8" title="1">{
+                log.Logger.Errorf("error getting discount for product %d", item.Product.ID, err)
+                return err
+        }</span>
+
+        <span class="cov8" title="1">log.Logger.Infof("Discount rate for product %d is %.2f -&gt; %.2f%% ", item.Product.ID, res.GetPercentage(), res.GetPercentage()*100)
+
+        item.DiscountRate = res.GetPercentage() * 100 // notation convenience
+
+        return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package dto
+
+import (
+        "errors"
+
+        "viniti.us/hashout/models/checkout"
+        customErr "viniti.us/hashout/models/errors"
+)
+
+type Item struct {
+        ID       int32  `json:"id" binding:"required,gt=0"`
+        Quantity uint32 `json:"quantity" binding:"required,gt=0"`
+}
+
+type Checkout struct {
+        Items []Item `json:"products" binding:"required,dive"`
+}
+
+func (i Item) ToDomain() checkout.Item <span class="cov8" title="1">{
+        return checkout.Item{
+                Product:  checkout.Product{ID: i.ID},
+                Quantity: i.Quantity,
+        }
+}</span>
+
+func (c Checkout) ToDomain() (cart checkout.Cart, err error) <span class="cov8" title="1">{
+        if len(c.Items) == 0 </span><span class="cov8" title="1">{
+                err = &amp;customErr.NotValid{Input: "Items", Err: errors.New("oops! You need to inform items to make a checkout")}
+                return
+        }</span>
+
+        <span class="cov8" title="1">var items []checkout.Item
+        uniqueItems := make(map[int32]Item)
+        for _, i := range c.Items </span><span class="cov8" title="1">{
+                if repeated, found := uniqueItems[i.ID]; found </span><span class="cov8" title="1">{
+                        uniqueItems[i.ID] = Item{ID: repeated.ID, Quantity: repeated.Quantity + i.Quantity}
+                }</span> else<span class="cov8" title="1"> {
+                        uniqueItems[i.ID] = i
+                }</span>
+        }
+
+        <span class="cov8" title="1">for _, v := range uniqueItems </span><span class="cov8" title="1">{
+                items = append(items, v.ToDomain())
+        }</span>
+
+        <span class="cov8" title="1">return checkout.Cart{
+                Items: items,
+        }, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package dto
+
+import "viniti.us/hashout/models/checkout"
+
+type CheckoutResponse struct {
+        Items                   []ItemResponse `json:"products"`
+        TotalAmount             uint32         `json:"total_amount"`
+        TotalDiscount           uint32         `json:"total_discount"`
+        TotalAmountWithDiscount uint32         `json:"total_amount_with_discount"`
+}
+
+type ItemResponse struct {
+        ID          int32  `json:"id"`
+        Quantity    uint32 `json:"quantity"`
+        UnitAmount  uint32 `json:"unit_amount"`
+        TotalAmount uint32 `json:"total_amount"`
+        Discount    uint32 `json:"discount"`
+        IsGift      bool   `json:"is_gift"`
+}
+
+func ToItemResponse(i checkout.Item) ItemResponse <span class="cov8" title="1">{
+        return ItemResponse{
+                ID:          i.Product.ID,
+                Quantity:    i.Quantity,
+                UnitAmount:  i.UnitAmount,
+                TotalAmount: i.TotalAmount,
+                Discount:    i.Discount,
+                IsGift:      i.Product.IsGift,
+        }
+}</span>
+
+func ToCheckoutResponse(c checkout.Cart) CheckoutResponse <span class="cov8" title="1">{
+        var items []ItemResponse
+        for _, i := range c.Items </span><span class="cov8" title="1">{
+                items = append(items, ToItemResponse(i))
+        }</span>
+
+        <span class="cov8" title="1">return CheckoutResponse{
+                TotalAmount:             c.TotalAmount,
+                TotalDiscount:           c.TotalDiscount,
+                TotalAmountWithDiscount: c.TotalAmountWithDiscount,
+                Items:                   items,
+        }</span>
+}
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package checkout
+
+type Cart struct {
+        Items                   []Item
+        TotalAmount             uint32
+        TotalDiscount           uint32
+        TotalAmountWithDiscount uint32
+}
+
+func (c *Cart) AddGift(p Product) <span class="cov8" title="1">{
+        if yes, _ := c.ContainsGift(); !yes </span><span class="cov8" title="1">{
+                item := Item{Quantity: 1}
+                gift := item.Merge(c.GiftFrom(p))
+                c.Items = append(c.Items, gift)
+        }</span>
+
+}
+
+func (c Cart) GiftFrom(p Product) Product <span class="cov8" title="1">{
+        return Product{
+                ID:     p.ID,
+                Title:  p.Title,
+                IsGift: p.IsGift,
+                Amount: 0,
+        }
+}</span>
+
+func (c Cart) ContainsGift() (contains bool, count int) <span class="cov8" title="1">{
+        for _, i := range c.Items </span><span class="cov8" title="1">{
+                if i.Product.IsGift </span><span class="cov8" title="1">{
+                        contains = true
+                        count += int(i.Quantity)
+                }</span>
+        }
+        <span class="cov8" title="1">return</span>
+}
+
+func (c *Cart) CalculateTotals() <span class="cov8" title="1">{
+        c.TotalAmount = 0
+        c.TotalAmountWithDiscount = 0
+        c.TotalDiscount = 0
+
+        for _, i := range c.Items </span><span class="cov8" title="1">{
+                c.TotalAmount += i.TotalAmount
+                c.TotalDiscount += i.Discount
+        }</span>
+
+        <span class="cov8" title="1">c.TotalAmountWithDiscount = c.TotalAmount - c.TotalDiscount</span>
+}
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">package checkout
+
+type Product struct {
+        ID          int32
+        Title       string
+        Description string
+        Amount      uint32
+        IsGift      bool `json:"is_gift"`
+}
+
+type Item struct {
+        Product      Product
+        Quantity     uint32
+        DiscountRate float32
+        UnitAmount   uint32
+        TotalAmount  uint32
+        Discount     uint32
+}
+
+func (i Item) Merge(p Product) Item <span class="cov8" title="1">{
+        return Item{
+                Product:      p,
+                Quantity:     i.Quantity,
+                DiscountRate: i.DiscountRate,
+                UnitAmount:   p.Amount,
+                TotalAmount:  p.Amount * i.Quantity,
+                Discount:     i.Discount,
+        }
+}</span>
+
+func (i *Item) CalculateDiscount() <span class="cov8" title="1">{
+        i.Discount = (i.TotalAmount * uint32(i.DiscountRate)) / 100
+}</span>
+</pre>
+		
+		<pre class="file" id="file5" style="display: none">package storage
+
+import (
+        "encoding/json"
+        "errors"
+
+        "viniti.us/hashout/config/db"
+        "viniti.us/hashout/models/checkout"
+        customErr "viniti.us/hashout/models/errors"
+)
+
+type ProductRepository struct {
+        db db.Database
+}
+
+func NewProductRepository(d db.Database) ProductRepository <span class="cov0" title="0">{
+        return ProductRepository{db: d}
+}</span>
+
+func (r ProductRepository) FindAll(items []checkout.Item) (mergedItems []checkout.Item, err error) <span class="cov8" title="1">{
+        var notFound []int32
+        for _, i := range items </span><span class="cov8" title="1">{
+                if p, found := r.db.FindProductByID(i.Product.ID); found </span><span class="cov8" title="1">{
+                        mergedItems = append(mergedItems, i.Merge(p))
+                }</span> else<span class="cov8" title="1"> {
+                        notFound = append(notFound, i.Product.ID)
+                }</span>
+        }
+
+        <span class="cov8" title="1">if len(notFound) &gt; 0 </span><span class="cov8" title="1">{
+                p, _ := json.Marshal(notFound)
+                err = &amp;customErr.NotFound{Entity: "Product", Err: errors.New("the following products were not found: " + string(p))}
+        }</span>
+
+        <span class="cov8" title="1">return</span>
+}
+
+func (r ProductRepository) FindLastByIsGift(isGift bool) (product checkout.Product, err error) <span class="cov8" title="1">{
+        product, _ = r.db.FindLastProductByIsGift(isGift)
+        return
+}</span>
+</pre>
+		
+		<pre class="file" id="file6" style="display: none">package checkout
+
+import (
+        "errors"
+        "time"
+
+        "viniti.us/hashout/config/app"
+        "viniti.us/hashout/config/log"
+        "viniti.us/hashout/models/checkout"
+        customErr "viniti.us/hashout/models/errors"
+        "viniti.us/hashout/usecase/discounts"
+)
+
+type UseCase struct {
+        repo             Repository
+        discountsUseCase discounts.Service
+        config           app.Config
+}
+
+func NewUseCase(repo Repository, discountsUseCase discounts.Service, config app.Config) UseCase <span class="cov0" title="0">{
+        return UseCase{repo: repo, discountsUseCase: discountsUseCase, config: config}
+}</span>
+
+func (u UseCase) Checkout(c *checkout.Cart) (err error) <span class="cov8" title="1">{
+        c.Items, err = u.repo.FindAll(c.Items)
+        if err != nil </span><span class="cov8" title="1">{
+                return err
+        }</span>
+
+        <span class="cov8" title="1">contains, count := c.ContainsGift()
+        if contains &amp;&amp; count &gt; u.config.GetAllowedGiftsPerCart() </span><span class="cov8" title="1">{
+                return &amp;customErr.NotValid{Input: "Gift Items", Err: errors.New("more than allowed gifts")}
+        }</span>
+
+        <span class="cov8" title="1">c.Items, err = u.discountsUseCase.CalculateDiscounts(c.Items)
+        if err != nil </span><span class="cov8" title="1">{
+                log.Logger.Warn("error upon calculating discounts for one or more products: ", err.Error())
+        }</span>
+
+        <span class="cov8" title="1">if u.IsBlackFridayGiftActive() </span><span class="cov8" title="1">{
+                gift, err := u.repo.FindLastByIsGift(true)
+                if err != nil </span><span class="cov8" title="1">{
+                        log.Logger.Warn("error adding a gift product: ", err.Error())
+                }</span> else<span class="cov8" title="1"> {
+                        c.AddGift(gift)
+                }</span>
+        }
+
+        <span class="cov8" title="1">c.CalculateTotals()
+
+        return nil</span>
+}
+
+func (u UseCase) IsBlackFridayGiftActive() bool <span class="cov8" title="1">{
+        _, currentMonth, currentDay := time.Now().Date()
+        return u.config.IsBlackFridayGiftActive() &amp;&amp; u.config.GetBlackFridayMonth() == currentMonth &amp;&amp; u.config.GetBlackFridayDay() == currentDay
+}</span>
+</pre>
+		
+		<pre class="file" id="file7" style="display: none">package discounts
+
+import (
+        "encoding/json"
+        "errors"
+
+        "viniti.us/hashout/config/log"
+        "viniti.us/hashout/models/checkout"
+        customErr "viniti.us/hashout/models/errors"
+)
+
+type UseCase struct {
+        cli Client
+}
+
+func NewUseCase(cli Client) UseCase <span class="cov0" title="0">{
+        return UseCase{cli: cli}
+}</span>
+
+func (u UseCase) CalculateDiscounts(items []checkout.Item) (itemsWithDiscount []checkout.Item, err error) <span class="cov8" title="1">{
+        var failedDiscounts []int32
+        for _, i := range items </span><span class="cov8" title="1">{
+                if err := u.cli.GetDiscount(&amp;i); err != nil </span><span class="cov8" title="1">{
+                        log.Logger.Warnf("could not get discount for product %d", i.Product.ID, err)
+                        failedDiscounts = append(failedDiscounts, i.Product.ID)
+                }</span> else<span class="cov8" title="1"> {
+                        i.CalculateDiscount()
+                }</span>
+                <span class="cov8" title="1">itemsWithDiscount = append(itemsWithDiscount, i)</span>
+        }
+
+        <span class="cov8" title="1">if len(failedDiscounts) &gt; 0 </span><span class="cov8" title="1">{
+                p, _ := json.Marshal(failedDiscounts)
+                err = &amp;customErr.DiscountError{Type: "Fetch", Err: errors.New("could not get discounts for products " + string(p))}
+        }</span>
+
+        <span class="cov8" title="1">return</span>
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>
