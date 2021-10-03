@@ -10,17 +10,17 @@ import (
 )
 
 type ProductRepository struct {
-	db db.ProductsDataset
+	db db.Database
 }
 
-func NewProductRepository(d db.ProductsDataset) ProductRepository {
+func NewProductRepository(d db.Database) ProductRepository {
 	return ProductRepository{db: d}
 }
 
 func (r ProductRepository) FindAll(items []checkout.Item) (mergedItems []checkout.Item, err error) {
 	var notFound []int32
 	for _, i := range items {
-		if p, found := r.db.ByID[i.Product.ID]; found {
+		if p, found := r.db.FindProductByID(i.Product.ID); found {
 			mergedItems = append(mergedItems, i.Merge(p))
 		} else {
 			notFound = append(notFound, i.Product.ID)
@@ -36,6 +36,6 @@ func (r ProductRepository) FindAll(items []checkout.Item) (mergedItems []checkou
 }
 
 func (r ProductRepository) FindLastByIsGift(isGift bool) (product checkout.Product, err error) {
-	product = r.db.ByIsGift[isGift]
+	product, _ = r.db.FindLastProductByIsGift(isGift)
 	return
 }

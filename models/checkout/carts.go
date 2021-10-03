@@ -25,7 +25,7 @@ func (c Cart) GiftFrom(p Product) Product {
 	}
 }
 
-func (c Cart) ContainsGift() (contains bool, count int32) {
+func (c Cart) ContainsGift() (contains bool, count int) {
 	for _, i := range c.Items {
 		if i.Product.IsGift {
 			contains = true

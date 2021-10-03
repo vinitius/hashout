@@ -31,7 +31,7 @@ func (c DiscountClient) GetDiscount(item *checkout.Item) error {
 
 	log.Logger.Infof("Discount rate for product %d is %.2f -> %.2f%% ", item.Product.ID, res.GetPercentage(), res.GetPercentage()*100)
 
-	item.DiscountRate = res.GetPercentage() * 100
+	item.DiscountRate = res.GetPercentage() * 100 // notation convenience
 
 	return nil
 }

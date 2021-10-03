@@ -9,10 +9,26 @@ import (
 	"viniti.us/hashout/models/checkout"
 )
 
+type Database interface {
+	FindProductByID(id int32) (checkout.Product, bool)
+	FindLastProductByIsGift(isGift bool) (checkout.Product, bool)
+}
+
 type ProductDataset struct {
-	Products []checkout.Product
-	ByID     map[int32]checkout.Product
-	ByIsGift map[bool]checkout.Product
+	Database Database
+	products []checkout.Product
+	byID     map[int32]checkout.Product
+	byIsGift map[bool]checkout.Product
+}
+
+func (d ProductDataset) FindProductByID(id int32) (p checkout.Product, found bool) {
+	p, found = d.byID[id]
+	return
+}
+
+func (d ProductDataset) FindLastProductByIsGift(isGift bool) (p checkout.Product, found bool) {
+	p, found = d.byIsGift[isGift]
+	return
 }
 
 func NewConnection() (d ProductDataset) {
@@ -22,17 +38,17 @@ func NewConnection() (d ProductDataset) {
 		return
 	}
 
-	json.Unmarshal(dbFile, &d.Products)
+	json.Unmarshal(dbFile, &d.products)
 
-	d.ByID = make(map[int32]checkout.Product)
-	d.ByIsGift = make(map[bool]checkout.Product)
+	d.byID = make(map[int32]checkout.Product)
+	d.byIsGift = make(map[bool]checkout.Product)
 
-	for _, p := range d.Products { // small known static collection
-		d.ByID[p.ID] = p
-		d.ByIsGift[p.IsGift] = p
+	for _, p := range d.products { // small known static collection
+		d.byID[p.ID] = p
+		d.byIsGift[p.IsGift] = p
 	}
 
-	log.Logger.Info("DB is up and running: dataset: ", d.Products)
+	log.Logger.Info("DB is up and running: dataset: ", d.products)
 
 	return
 }

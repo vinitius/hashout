@@ -7,6 +7,7 @@ package app
 
 import (
 	"viniti.us/hashout/clients"
+	"viniti.us/hashout/config/app"
 	"viniti.us/hashout/config/db"
 	"viniti.us/hashout/config/grpc"
 	"viniti.us/hashout/handlers"
@@ -20,13 +21,14 @@ import (
 
 func SetupApplication() *server.Api {
 	engine := server.NewRouter()
-	productsDataset := db.NewConnection()
-	productRepository := storage.NewProductRepository(productsDataset)
+	productDataset := db.NewConnection()
+	productRepository := storage.NewProductRepository(productDataset)
 	context := grpc.NewContext()
 	discountClient := grpc.NewDiscountGRPCClient()
 	clientsDiscountClient := clients.NewDiscountClient(context, discountClient)
 	useCase := discounts.NewUseCase(clientsDiscountClient)
-	checkoutUseCase := checkout.NewUseCase(productRepository, useCase)
+	hashoutApp := app.NewAppConfig()
+	checkoutUseCase := checkout.NewUseCase(productRepository, useCase, hashoutApp)
 	checkoutHandler := handlers.NewCheckoutHandler(checkoutUseCase)
 	httpServer := server.NewHttpServer(engine, checkoutHandler)
 	api := &server.Api{

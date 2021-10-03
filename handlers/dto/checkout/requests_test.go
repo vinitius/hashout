@@ -1,11 +1,13 @@
 package dto
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 	"viniti.us/hashout/models/checkout"
+	customErr "viniti.us/hashout/models/errors"
 )
 
 type RequestsTestSuite struct {
@@ -68,7 +70,7 @@ func (s *RequestsTestSuite) TestCheckoutToDomain() {
 		Items:                   expectedItems,
 	}
 
-	actual := dto.ToDomain()
+	actual, _ := dto.ToDomain()
 
 	assert.Equal(s.T(), expected, actual)
 }
@@ -103,7 +105,20 @@ func (s *RequestsTestSuite) TestCheckoutWithRepeatedItemsToDomain() {
 		Items:                   expectedItems,
 	}
 
-	actual := dto.ToDomain()
+	actual, _ := dto.ToDomain()
 
 	assert.Equal(s.T(), expected, actual)
+}
+
+func (s *RequestsTestSuite) TestCheckoutEmptyItems() {
+	items := []Item{}
+	dto := Checkout{
+		Items: items,
+	}
+
+	expectedError := &customErr.NotValid{Input: "Items", Err: errors.New("oops! You need to inform items to make a checkout")}
+
+	_, err := dto.ToDomain()
+
+	assert.Exactly(s.T(), expectedError, err)
 }
