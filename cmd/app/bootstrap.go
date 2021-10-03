@@ -27,7 +27,10 @@ func loadConfig(from string) {
 
 func getEnvWithDefault(envVar, defaultValue string) string {
 	if value, ok := os.LookupEnv(envVar); ok {
-		return value
+		if value != "" {
+			return value
+		}
+
 	}
 	return defaultValue
 }

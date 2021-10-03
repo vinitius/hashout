@@ -11,7 +11,7 @@ func init() {
 }
 
 func main() {
-	err := app.Run()
+	err := app.Run() // this can be wrapped in a different routine
 	if err != nil {
 		log.Logger.Fatalw("Error starting http server", "error", err)
 	}

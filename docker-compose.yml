@@ -1,0 +1,28 @@
+version: "3.8"
+
+services:
+  hashout:
+    build:
+      context: .
+      dockerfile: Dockerfile  
+    container_name: hashout
+    environment:
+      - env=compose
+    ports:
+      - 8181:8181
+    networks:
+      - hashout_net
+
+  discount-service:
+    image: hashorg/hash-mock-discount-service
+    container_name: discount-service
+    depends_on:
+      hashout: 
+        condition: service_healthy
+    ports:
+      - 50051:50051
+    networks:
+      - hashout_net
+
+networks:
+  hashout_net:
