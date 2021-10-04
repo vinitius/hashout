@@ -14,7 +14,7 @@ docs:
 	${GOPATH}/bin/swag init --parseDependency --dir handlers/server/ -g api.go -o handlers/server/
 
 tests:
-	go test ./usecase/... ./clients/... ./storage/... ./models/... ./handlers/... -v -coverprofile=test/coverage/coverage.out ;\
+	go test ./usecase/checkout/... ./usecase/discounts/... ./clients/... ./storage/... ./models/checkout/... ./handlers/dto/... -v -coverprofile=test/coverage/coverage.out ;\
 	go tool cover -func=test/coverage/coverage.out ;\
 	go tool cover -html=test/coverage/coverage.out -o test/coverage/coverage.html
 

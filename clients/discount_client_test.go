@@ -7,6 +7,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
+	"viniti.us/hashout/config/cb"
 	"viniti.us/hashout/config/log"
 	domain "viniti.us/hashout/models/checkout"
 	discountPB "viniti.us/hashout/pb"
@@ -29,7 +30,7 @@ func (s *DiscountClientSuite) SetupTest() {
 	log.SetupLogger()
 	s.grpc = new(mocks.DiscountClient)
 	s.ctx = context.Background()
-	s.cli = DiscountClient{grpc: s.grpc, ctx: s.ctx}
+	s.cli = DiscountClient{grpc: s.grpc, ctx: s.ctx, command: cb.NewDiscountCB()}
 }
 
 func TestRun(t *testing.T) {

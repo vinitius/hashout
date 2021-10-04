@@ -3,6 +3,7 @@ package config
 import (
 	"viniti.us/hashout/clients"
 	"viniti.us/hashout/config/app"
+	"viniti.us/hashout/config/cb"
 	"viniti.us/hashout/config/db"
 	"viniti.us/hashout/config/grpc"
 	"viniti.us/hashout/handlers"
@@ -15,6 +16,7 @@ import (
 
 var Container = wire.NewSet(
 	app.Provider,
+	cb.Provider,
 	grpc.Provider,
 	db.Provider,
 	storage.Provider,
