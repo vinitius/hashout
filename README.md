@@ -19,6 +19,7 @@ It also calculates discounts based off an external [discount's gRPC service](htt
 | Method       | Resource            | Description                             |
 |--------------|---------------------|-----------------------------------------|
 | POST         |[/checkout]()        | Checkout by a set of pre-defined rules. |
+| GET          |[/ping]()            | Healthcheck.                            |
 | GET          |[/docs/index.html]() | Swagger-UI with an API Playground.      |
 
   
@@ -64,9 +65,13 @@ make deps
 ```
 
 Go build:
-
 ```
 make build
+```
+
+Dependency Injection:
+```
+make di
 ```
 
 If you feel more comfortable running `go` commands directly, take a look at the [Makefile]() to check what you need.
@@ -116,13 +121,58 @@ Run in your favorite IDE or just run the single container instead of compose.
 
 # Proto
 
-You need protoc and then:
+You need [protoc]() and then:
 
 ```
 make proto
 ```
 
 # Profiling
+25000 Requests: `Ubuntu x64 i7 32GB`
+```
+Summary:
+  Total:	2.2339 secs
+  Slowest:	0.0510 secs
+  Fastest:	0.0002 secs
+  Average:	0.0043 secs
+  Requests/sec:	11191.1314
+  
+  Total data:	4625000 bytes
+  Size/request:	185 bytes
+
+Response time histogram:
+  0.000 [1]	|
+  0.005 [18417]	|■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+  0.010 [3392]	|■■■■■■■
+  0.015 [1717]	|■■■■
+  0.020 [725]	|■■
+  0.026 [400]	|■
+  0.031 [160]	|
+  0.036 [82]	|
+  0.041 [33]	|
+  0.046 [51]	|
+  0.051 [22]	|
+
+
+Latency distribution:
+  10% in 0.0003 secs
+  25% in 0.0006 secs
+  50% in 0.0018 secs
+  75% in 0.0056 secs
+  90% in 0.0121 secs
+  95% in 0.0165 secs
+  99% in 0.0281 secs
+
+Details (average, fastest, slowest):
+  DNS+dialup:	0.0000 secs, 0.0002 secs, 0.0510 secs
+  DNS-lookup:	0.0000 secs, 0.0000 secs, 0.0028 secs
+  req write:	0.0000 secs, 0.0000 secs, 0.0057 secs
+  resp wait:	0.0043 secs, 0.0001 secs, 0.0509 secs
+  resp read:	0.0001 secs, 0.0000 secs, 0.0046 secs
+
+Status code distribution:
+  [200]	25000 responses
+```
 
   
 
@@ -144,6 +194,4 @@ make proto
 
 - Buffer discount requests
 
-- SRE: rollback runbook
-
-- SRE: metrics
+- SRE: rollback runbook, metrics
