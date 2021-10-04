@@ -24,7 +24,7 @@ It also calculates discounts based off an external [discount's gRPC service](htt
 
   
 
-Import the [API specs]() into your favorite Rest Client.
+Import the [API specs](handlers/server/swagger.json) into your favorite Rest Client.
 
  Generate docs:
 
@@ -38,9 +38,9 @@ make docs
 
 - `go` >= 1.16
 
-- `make` (optional for better build experiences)
+- `make` (optional for a better build experience)
 
-- `Docker/Docker-Compose` (optional for better deploy experiences)
+- `Docker/Docker-Compose` (optional for a better deploy experience)
 
   
 
@@ -72,7 +72,7 @@ Dependency Injection:
 make di
 ```
 
-If you feel more comfortable running `go` commands directly, take a look at the [Makefile]() to check what you need.
+If you feel more comfortable running `go` commands directly, take a look at the [Makefile](Makefile) to check what you need.
   
 
 # Test
@@ -127,6 +127,7 @@ make proto
 
 # Profiling
  `Ubuntu x64 i7 32GB`
+
 *WEB:*
 ```
 Summary:
