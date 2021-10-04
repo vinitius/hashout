@@ -53,6 +53,30 @@ make docs
 - `Testify/Mockery`(unit tests/mocks)
 
   
+# Run
+
+You can either:
+
+```
+docker-compose up -d
+```
+
+Or:
+
+```
+make run
+```
+
+Or even:
+
+```
+go run cmd/main.go
+```
+
+Also:
+
+Run in your favorite IDE or just run the single container instead of compose.
+
 
 # Build
 
@@ -88,34 +112,6 @@ Run tests and generate coverage report:
 ```
 make tests
 ```
-
-  
-
-# Run
-
-You can either:
-
-```
-docker-compose up -d
-```
-
-Or:
-
-```
-make run
-```
-
-Or even:
-
-```
-go run cmd/main.go
-```
-
-Also:
-
-Run in your favorite IDE or just run the single container instead of compose.
-
-  
 
 # Proto
 
