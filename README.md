@@ -10,9 +10,9 @@ It also calculates discounts based off an external [discount's gRPC service](htt
   
 
 # Arch
+![](arch.png)
 
   
-
 # Docs
 
 
