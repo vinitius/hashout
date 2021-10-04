@@ -27,8 +27,8 @@ mocks:
 	${GOPATH}/bin/mockery --name=Client --recursive --output=test/mocks/clients --filename=discount_client.go --structname=DiscountClient
 
 proto:
-	${GOPATH}/bin/protoc --go-grpc_out=.  pb/discount.proto ;\
-	${GOPATH}/bin/protoc --go_out=.  pb/discount.proto
+	protoc --go-grpc_out=.  pb/discount.proto ;\
+	protoc --go_out=.  pb/discount.proto
 
 di:
 	cd cmd/app ;\
