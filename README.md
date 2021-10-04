@@ -50,8 +50,6 @@ make docs
 
 - `Gin` (http)
 
-- `Swaggo` (swagger)
-
 - `Testify/Mockery`(unit tests/mocks)
 
   
@@ -121,14 +119,15 @@ Run in your favorite IDE or just run the single container instead of compose.
 
 # Proto
 
-You need [protoc]() and then:
+You need [protoc](https://developers.google.com/protocol-buffers/docs/gotutorial) and then:
 
 ```
 make proto
 ```
 
 # Profiling
-25000 Requests: `Ubuntu x64 i7 32GB`
+ `Ubuntu x64 i7 32GB`
+*WEB:*
 ```
 Summary:
   Total:	2.2339 secs
@@ -174,6 +173,28 @@ Status code distribution:
   [200]	25000 responses
 ```
 
+*CPU:*
+```
+Showing nodes accounting for 4.01s, 79.56% of 5.04s total
+      flat  flat%   sum%        cum   cum%
+     0.02s   0.4% 66.67%      4.11s 81.55%  net/http.(*conn).serve
+     0.01s   0.2% 79.17%         3s 59.52%  viniti.us/hashout/handlers.CheckoutHandler.checkout
+     0.01s   0.2% 79.37%      0.04s  0.79%  viniti.us/hashout/usecase/checkout.UseCase.IsBlackFridayGiftActive
+     0.01s   0.2% 79.56%      1.87s 37.10%  viniti.us/hashout/usecase/discounts.UseCase.CalculateDiscounts
+```
+
+*MEM:*
+```
+Showing nodes accounting for 9911.22kB, 97.37% of 10178.83kB total
+      flat  flat%   sum%        cum   cum%
+   9760kB   95.89% 95.89%     9760kB 95.89%  golang.org/x/net/webdav.(*memFile).Write
+   63.38kB  0.62%  97.29%    63.38kB  0.62%  bufio.NewWriterSize (inline)
+   8.22kB   0.081% 97.37%    54.51kB  0.54%  net/http.(*conn).readRequest
+         0     0% 97.37%   125.98kB  1.24%  viniti.us/hashout/handlers.CheckoutHandler.checkout
+         0     0% 97.37%   125.98kB  1.24%  viniti.us/hashout/handlers.apiErrorReporter.func1
+         0     0% 97.37%   113.77kB  1.12%  viniti.us/hashout/usecase/checkout.UseCase.Checkout
+```
+
   
 
 # SRE
@@ -184,11 +205,11 @@ Status code distribution:
 
 # TBD
 
-- Add cache layer with [Redis]()
+- Add cache layer with [Redis](https://redis.io/)
 
 - Improve validation messages
 
-- Add integration tests suite with [TestContainers]()
+- Add integration tests suite with [TestContainers](https://www.testcontainers.org/)
 
 - Add lint
 
