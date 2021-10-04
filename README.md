@@ -12,6 +12,26 @@ It also calculates discounts based off an external [discount's gRPC service](htt
 # Arch
 ![](arch.png)
 
+![](cloud.png)
+
+# Dependencies
+
+- `go` >= 1.16
+
+- `make` (optional for a better build experience)
+
+- `Docker/Docker-Compose` (optional for a better deploy experience)
+
+  
+
+# Main Dev Dependencies
+
+- `Wire` (DI)
+
+- `Gin` (http)
+
+- `Testify/Mockery`(unit tests/mocks)
+
   
 # Docs
 
@@ -32,25 +52,24 @@ Import the [API specs](handlers/server/swagger.json) into your favorite Rest Cli
 make docs
 ```
 
-  
+# Config
+You can customize config files located under  `cmd/etc/` according to the environment:
 
-# Dependencies
+```
+# general
+SERVER_PORT=8181
+LOG_LEVEL=DEBUG
+ENV=local
 
-- `go` >= 1.16
+# grpc
+DISCOUNT_GRPC_SERVER_ADDRESS=localhost:50051
 
-- `make` (optional for a better build experience)
+# max number of gift items per cart
+ALLOWED_GIFTS_PER_CART=1
 
-- `Docker/Docker-Compose` (optional for a better deploy experience)
-
-  
-
-# Main Dev Dependencies
-
-- `Wire` (DI)
-
-- `Gin` (http)
-
-- `Testify/Mockery`(unit tests/mocks)
+# black friday gift feature toggle
+BLACK_FRIDAY_GIFT_TOGGLE=true
+```
 
   
 # Run
