@@ -12,6 +12,8 @@ It also calculates discounts based off an external [discount's gRPC service](htt
 # Arch
 ![](arch.png)
 
+
+# Deploy
 ![](cloud.png)
 
 # Dependencies
@@ -94,7 +96,7 @@ go run cmd/main.go
 
 Also:
 
-Run in your favorite IDE or just run the single container instead of compose.
+*Run in your favorite IDE or just run the single container instead of compose.*
 
 
 # Build
@@ -115,7 +117,7 @@ Dependency Injection:
 make di
 ```
 
-If you feel more comfortable running `go` commands directly, take a look at the [Makefile](Makefile) to check what you need.
+*If you feel more comfortable running `go` commands directly, take a look at the [Makefile](Makefile) to check what you need.*
   
 
 # Test
